@@ -5,7 +5,7 @@ from structures.Polygon import Polygon
 import random, time, turtle
 from master.triangulation import is_convex_vertex
 from structures.Point import point
-
+from math import e
 
 #funkcija koja vraca skup reflesnik vrhova poligona - testirano
 
@@ -112,31 +112,54 @@ def create_init_population(reflex_vertices:List[point], poly:Polygon)->Tuple[Lis
 
 
 
+def sigmoid_opeataion(n:float)->int:
+    i = 1/(1+e**n)
+    rand = random.random()
+    if rand < i:
+        return 1
+    else:
+        return 0
+
 def create_mutant_vector(current_population:List[List[int]]):
 
     for i in range(0, len(current_population)):
+
+        mutant_vector = []
+        mutant_vector_temp = []
+
+        F = 0.6
+
+        rez = []
+
         target_vector = current_population[i]
 
-        r_0 = random.randint(0, len(current_population))
+        r_0 = random.randint(0, len(current_population)-1)
 
         while current_population[r_0] == target_vector:
-            r_0 = random.randint(0, len(current_population))
+            r_0 = random.randint(0, len(current_population)-1)
 
         base_vector = current_population[r_0]
 
-        r_1 = random.randint(0, len(current_population))
+        r_1 = random.randint(0, len(current_population)-1)
 
         while current_population[r_1] == target_vector or current_population[r_1] == base_vector:
-            r_1 = random.randint(0, len(current_population))
+            r_1 = random.randint(0, len(current_population)-1)
 
         r_1_vector = current_population[r_1]
 
-        r_2 = random.randint(0, len(current_population))
+        r_2 = random.randint(0, len(current_population)-1)
 
         while current_population[r_2] == target_vector or current_population[r_2] == base_vector or current_population[r_2] == r_1_vector:
-            r_2 = random.randint(0, len(current_population))
+            r_2 = random.randint(0, len(current_population)-1)
 
         r_2_vector = current_population[r_2]
+        rez = [(x - y)*F for x ,y in zip(r_1_vector, r_2_vector)]
+
+        print(rez)
+        mutant_vector_temp = [x + y for x,y in zip(base_vector, rez)]
+        mutant_vector = [sigmoid_opeataion(x) for x in mutant_vector_temp]
+
+        print(mutant_vector)
 
 
 
@@ -145,7 +168,8 @@ polygon = Polygon(get_simple_polygon(p))
 
 test = create_init_population(reflex_vertices(polygon), polygon)
 
-# print(len(test))
+create_mutant_vector(test[1])
+print(len(test[1]))
 
 #
 # p = create_coordinates('randsimple-20-1')
